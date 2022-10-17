@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\CategoryRepository;
+use App\Repository\AuthorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=CategoryRepository::class)
+ * @ORM\Entity(repositoryClass=AuthorRepository::class)
  */
-class Category
+class Author
 {
     /**
      * @ORM\Id
@@ -22,15 +22,20 @@ class Category
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private $authorName;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="date")
+     */
+    private $birthday;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $description;
 
     /**
-     * @ORM\OneToMany(targetEntity=Book::class, mappedBy="category")
+     * @ORM\OneToMany(targetEntity=Book::class, mappedBy="author")
      */
     private $books;
 
@@ -44,14 +49,26 @@ class Category
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getAuthorName(): ?string
     {
-        return $this->name;
+        return $this->authorName;
     }
 
-    public function setName(string $name): self
+    public function setAuthorName(string $authorName): self
     {
-        $this->name = $name;
+        $this->authorName = $authorName;
+
+        return $this;
+    }
+
+    public function getBirthday(): ?\DateTimeInterface
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday(\DateTimeInterface $birthday): self
+    {
+        $this->birthday = $birthday;
 
         return $this;
     }
@@ -61,7 +78,7 @@ class Category
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
@@ -80,7 +97,7 @@ class Category
     {
         if (!$this->books->contains($book)) {
             $this->books[] = $book;
-            $book->setCategory($this);
+            $book->setAuthor($this);
         }
 
         return $this;
@@ -90,8 +107,8 @@ class Category
     {
         if ($this->books->removeElement($book)) {
             // set the owning side to null (unless already changed)
-            if ($book->getCategory() === $this) {
-                $book->setCategory(null);
+            if ($book->getAuthor() === $this) {
+                $book->setAuthor(null);
             }
         }
 
