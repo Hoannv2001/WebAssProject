@@ -6,6 +6,7 @@
     <h1>Create new Book</h1>
 
     {{ include('book/_form.html.twig') }}
-
-    <a href="{{ path('app_book_index') }}">back to list</a>
+    <div class="container container-table">
+        <a class="btn btn-secondary" href="{{ path('app_book_index') }}">back to list</a>
+    </div>
 {% endblock %}
