@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @Route("/book")
  */
 class BookController extends AbstractController
-{
+{   
     /**
      * @Route("/", name="app_book_index", methods={"GET"})
      */
