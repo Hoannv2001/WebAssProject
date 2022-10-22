@@ -24,6 +24,19 @@ class OrderController extends AbstractController
             'orders' => $orderRepository->findAll(),
         ]);
     }
+    /**
+     * @Route("/orders", name="orders_list")
+     */
+    public function listAction()
+    {
+        $orders = $this->getDoctrine()
+            ->getRepository(orders::class)
+            ->findAll();
+        return $this->render('orders/index.html.twig', [
+            'orders' => $orders
+        ]);
+    }
+
 
     /**
      * @Route("/new", name="app_order_new", methods={"GET", "POST"})
