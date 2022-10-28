@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -16,12 +18,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
-    /**
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
@@ -40,17 +36,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $FirstName;
+    private $fullName;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $LastName;
+    private $phoneNumber;
 
-    public function getId(): ?int
+    /**
+     * @ORM\OneToMany(targetEntity=Book::class, mappedBy="user")
+     */
+    private $books;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="customer")
+     */
+    private $orders;
+
+    public function __construct()
     {
-        return $this->id;
+        $this->books = new ArrayCollection();
+        $this->orders = new ArrayCollection();
     }
+
 
     public function getEmail(): ?string
     {
@@ -90,7 +98,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
+//        $roles[] = 'ROLE_SELLER';
         return array_unique($roles);
     }
 
@@ -136,26 +144,86 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getFirstName(): ?string
+    public function getFullName(): ?string
     {
-        return $this->FirstName;
+        return $this->fullName;
     }
 
-    public function setFirstName(string $FirstName): self
+    public function setFullName(string $fullName): self
     {
-        $this->FirstName = $FirstName;
+        $this->fullName = $fullName;
 
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getPhoneNumber(): ?string
     {
-        return $this->LastName;
+        return $this->phoneNumber;
     }
 
-    public function setLastName(string $LastName): self
+    public function setPhoneNumber(string $phoneNumber): self
     {
-        $this->LastName = $LastName;
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Book>
+     */
+    public function getBooks(): Collection
+    {
+        return $this->books;
+    }
+
+    public function addBook(Book $book): self
+    {
+        if (!$this->books->contains($book)) {
+            $this->books[] = $book;
+            $book->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBook(Book $book): self
+    {
+        if ($this->books->removeElement($book)) {
+            // set the owning side to null (unless already changed)
+            if ($book->getUser() === $this) {
+                $book->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Order>
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(Order $order): self
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders[] = $order;
+            $order->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(Order $order): self
+    {
+        if ($this->orders->removeElement($order)) {
+            // set the owning side to null (unless already changed)
+            if ($order->getCustomer() === $this) {
+                $order->setCustomer(null);
+            }
+        }
 
         return $this;
     }
