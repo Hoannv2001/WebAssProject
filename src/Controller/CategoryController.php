@@ -2,9 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Book;
 use App\Entity\Category;
 use App\Form\CategoryType;
+use App\Repository\AuthorRepository;
 use App\Repository\CategoryRepository;
+use phpDocumentor\Reflection\Types\This;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,12 +32,18 @@ class CategoryController extends AbstractController
     /**
      * @Route("/new", name="app_category_new", methods={"GET", "POST"})
      */
-    public function new(Request $request, CategoryRepository $categoryRepository): Response
+    public function new(Request $request, CategoryRepository $categoryRepository, LoggerInterface $logger): Response
     {
         $category = new Category();
+
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
 
+        $user = $this->getUser();
+
+        if (is_null($user)){
+            return $this->redirectToRoute('app_login',[],Response::HTTP_SEE_OTHER);
+        }
         if ($form->isSubmitted() && $form->isValid()) {
             $categoryRepository->add($category, true);
 
@@ -79,8 +89,10 @@ class CategoryController extends AbstractController
     /**
      * @Route("/{id}", name="app_category_delete", methods={"POST"})
      */
-    public function delete(Request $request, Category $category, CategoryRepository $categoryRepository): Response
+    public function delete(Request $request, Category $category,
+                           CategoryRepository $categoryRepository, LoggerInterface $logger): Response
     {
+        $user=$this->getUser();
         if ($this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))) {
             $categoryRepository->remove($category, true);
         }
