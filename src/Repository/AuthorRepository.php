@@ -38,6 +38,15 @@ class AuthorRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    public function countOfAuthor(): Query
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select('a')
+            ->from('App:Author', 'a');
+        return $qb->getQuery();
+
+    }
 
 //    /**
 //     * @return Author[] Returns an array of Author objects

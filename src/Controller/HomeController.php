@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use http\Env\Request;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
