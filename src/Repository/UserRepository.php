@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -27,7 +28,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function add(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
-
         if ($flush) {
             $this->getEntityManager()->flush();
         }
@@ -36,7 +36,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function remove(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
-
         if ($flush) {
             $this->getEntityManager()->flush();
         }
@@ -50,10 +49,28 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
-
         $user->setPassword($newHashedPassword);
-
         $this->add($user, true);
+    }
+    public function selectInfoUser(): Query
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select('t')
+            ->from('App:User', 't')
+            ->where('t.roles LIKE :roles')
+            ->setParameter('roles', '%"ROLE_CUSTOMER"%');
+        return $qb->getQuery();
+    }
+    public function selectInfoSeller(): Query
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select('t')
+            ->from('App:User', 't')
+            ->where('t.roles LIKE :roles')
+            ->setParameter('roles', '%"ROLE_SELLER"%');
+        return $qb->getQuery();
     }
 
 //    /**

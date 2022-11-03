@@ -20,15 +20,6 @@ class Order
      */
     private $id;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $quality;
-
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $totalPrice;
 
     /**
      * @ORM\Column(type="date")
@@ -36,42 +27,30 @@ class Order
     private $dateOrder;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Book::class, inversedBy="orders")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     * @ORM\JoinColumn(name="customerEmail", referencedColumnName="email")
      */
-    private $orderBook;
+    private $customer;
+
+    /**
+     * @ORM\OneToMany(targetEntity=OrderItems::class, mappedBy="orderB")
+     */
+    private $orderItems;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $totalPaymet;
 
     public function __construct()
     {
-        $this->orderBook = new ArrayCollection();
+        $this->orderItems = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getQuality(): ?int
-    {
-        return $this->quality;
-    }
-
-    public function setQuality(int $quality): self
-    {
-        $this->quality = $quality;
-
-        return $this;
-    }
-
-    public function getTotalPrice(): ?float
-    {
-        return $this->totalPrice;
-    }
-
-    public function setTotalPrice(float $totalPrice): self
-    {
-        $this->totalPrice = $totalPrice;
-
-        return $this;
     }
 
     public function getDateOrder(): ?\DateTimeInterface
@@ -86,26 +65,56 @@ class Order
         return $this;
     }
 
-    /**
-     * @return Collection<int, Book>
-     */
-    public function getOrderBook(): Collection
+    public function getCustomer(): ?User
     {
-        return $this->orderBook;
+        return $this->customer;
     }
 
-    public function addOrderBook(Book $orderBook): self
+    public function setCustomer(?User $customer): self
     {
-        if (!$this->orderBook->contains($orderBook)) {
-            $this->orderBook[] = $orderBook;
+        $this->customer = $customer;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OrderItems>
+     */
+    public function getOrderItems(): Collection
+    {
+        return $this->orderItems;
+    }
+
+    public function addOrderItem(OrderItems $orderItem): self
+    {
+        if (!$this->orderItems->contains($orderItem)) {
+            $this->orderItems[] = $orderItem;
+            $orderItem->setOrderB($this);
         }
 
         return $this;
     }
 
-    public function removeOrderBook(Book $orderBook): self
+    public function removeOrderItem(OrderItems $orderItem): self
     {
-        $this->orderBook->removeElement($orderBook);
+        if ($this->orderItems->removeElement($orderItem)) {
+            // set the owning side to null (unless already changed)
+            if ($orderItem->getOrderB() === $this) {
+                $orderItem->setOrderB(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTotalPaymet(): ?float
+    {
+        return $this->totalPaymet;
+    }
+
+    public function setTotalPaymet(float $totalPaymet): self
+    {
+        $this->totalPaymet = $totalPaymet;
 
         return $this;
     }

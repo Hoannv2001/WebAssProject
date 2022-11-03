@@ -43,11 +43,59 @@ class BookRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $qb = $entityManager->createQueryBuilder();
-        $qb->select('b)')
+        $qb->select('b')
             ->from('App:Book', 'b');
-
         return $qb->getQuery();
 
+    }
+    public function selectDataBookAdmin($user):Query
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select('b')
+            ->from('App:Book', 'b')
+            ->where('b.user = :user')
+            ->setParameter('user', $user);
+        return $qb->getQuery();
+    }
+    public  function findAllPriceRange($minPrice,$maxPrice,$cat,$author): Query
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select('b')
+            ->from('App:Book', 'b');
+        if (is_null($minPrice) || empty($minPrice)){
+            $minPrice=0;
+        }
+        $qb->where('b.price >=' . $minPrice);
+        if (!(is_null($maxPrice) || empty($maxPrice))){
+            $qb->andWhere('b.price <=' . $maxPrice);
+        }
+        if (!(is_null($cat)||empty($cat))){
+            $qb->andWhere('b.category =' . $cat);
+        }
+        if (!((is_null($author))||empty($author)))
+            $qb->andWhere('b.author =' . $author);
+        return $qb->getQuery();
+    }
+    public function findPriceOfId($idBook):Query
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select('b')
+            ->from('App:Book', 'b')
+            ->where('b.price =' . $idBook);
+        return $qb->getQuery();
+    }
+    public function findInfoBook($idBook):Query
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select('b')
+            ->from('App:Book', 'b')
+            ->where('b.author =' . $idBook);
+//            ->andWhere('b.price =' . $idBook);
+        return $qb->getQuery();
     }
 
 //    /**

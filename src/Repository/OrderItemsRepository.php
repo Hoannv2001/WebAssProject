@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\Order;
+use App\Entity\OrderItems;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Order>
+ * @extends ServiceEntityRepository<OrderItems>
  *
- * @method Order|null find($id, $lockMode = null, $lockVersion = null)
- * @method Order|null findOneBy(array $criteria, array $orderBy = null)
- * @method Order[]    findAll()
- * @method Order[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method OrderItems|null find($id, $lockMode = null, $lockVersion = null)
+ * @method OrderItems|null findOneBy(array $criteria, array $orderBy = null)
+ * @method OrderItems[]    findAll()
+ * @method OrderItems[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class OrderRepository extends ServiceEntityRepository
+class OrderItemsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Order::class);
+        parent::__construct($registry, OrderItems::class);
     }
 
-    public function add(Order $entity, bool $flush = false): void
+    public function add(OrderItems $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -31,7 +31,7 @@ class OrderRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Order $entity, bool $flush = false): void
+    public function remove(OrderItems $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -39,18 +39,20 @@ class OrderRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    public function findID(): Query
+    public function selectInfoUser($orderB): Query
     {
         $entityManager = $this->getEntityManager();
         $qb = $entityManager->createQueryBuilder();
-        $qb->select('oI.id')
-            ->from('App:Order', 'oI');
-//            ->where('oI.orderB');
+        $qb->select('count(oI.orderB)')
+            ->from('App:OrderItems', 'oI')
+            ->where('oI.orderB LIKE :roles');
+//            ->getParameter();
+
         return $qb->getQuery();
     }
 
 //    /**
-//     * @return Order[] Returns an array of Order objects
+//     * @return OrderItems[] Returns an array of OrderItems objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -64,7 +66,7 @@ class OrderRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Order
+//    public function findOneBySomeField($value): ?OrderItems
 //    {
 //        return $this->createQueryBuilder('o')
 //            ->andWhere('o.exampleField = :val')

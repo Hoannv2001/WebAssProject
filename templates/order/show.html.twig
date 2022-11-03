@@ -7,22 +7,22 @@
 
     <table class="table">
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ order.id }}</td>
-            </tr>
-            <tr>
-                <th>Quality</th>
-                <td>{{ order.quality }}</td>
-            </tr>
-            <tr>
-                <th>TotalPrice</th>
-                <td>{{ order.totalPrice }}</td>
-            </tr>
-            <tr>
-                <th>DateOrder</th>
-                <td>{{ order.dateOrder ? order.dateOrder|date('Y-m-d') : '' }}</td>
-            </tr>
+        <tr>
+            <th>Id</th>
+            <td>{{ order.id }}</td>
+        </tr>
+        <tr>
+            <th>Quality</th>
+            <td>{{ order.quality }}</td>
+        </tr>
+        <tr>
+            <th>TotalPrice</th>
+            <td>{{ order.totalPrice }}</td>
+        </tr>
+        <tr>
+            <th>DateOrder</th>
+            <td>{{ order.dateOrder ? order.dateOrder|date('Y-m-d') : '' }}</td>
+        </tr>
         </tbody>
     </table>
 

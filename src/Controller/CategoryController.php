@@ -28,19 +28,16 @@ class CategoryController extends AbstractController
             'categories' => $categoryRepository->findAll(),
         ]);
     }
-
     /**
      * @Route("/new", name="app_category_new", methods={"GET", "POST"})
      */
     public function new(Request $request, CategoryRepository $categoryRepository, LoggerInterface $logger): Response
     {
         $category = new Category();
-
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
-
         $user = $this->getUser();
-
+        $hasAccessAdmin = $this->isGranted('ROLE_ADMIN');
         if (is_null($user)){
             return $this->redirectToRoute('app_login',[],Response::HTTP_SEE_OTHER);
         }
@@ -49,11 +46,14 @@ class CategoryController extends AbstractController
 
             return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
         }
-
-        return $this->renderForm('category/new.html.twig', [
-            'category' => $category,
-            'form' => $form,
-        ]);
+        if($hasAccessAdmin){
+            return $this->renderForm('category/new.html.twig', [
+                'category' => $category,
+                'form' => $form,
+            ]);
+        }else{
+            return new Response("No Access");
+        }
     }
 
     /**
@@ -61,11 +61,15 @@ class CategoryController extends AbstractController
      */
     public function show(Category $category): Response
     {
-        return $this->render('category/show.html.twig', [
-            'category' => $category,
-        ]);
+        $hasAccessAdmin = $this->isGranted('ROLE_ADMIN');
+        if ($hasAccessAdmin){
+            return $this->render('category/show.html.twig', [
+                'category' => $category,
+            ]);
+        }else{
+            return new Response("No Access");
+        }
     }
-
     /**
      * @Route("/{id}/edit", name="app_category_edit", methods={"GET", "POST"})
      */
@@ -73,17 +77,20 @@ class CategoryController extends AbstractController
     {
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
-
+        $hasAccessAdmin = $this->isGranted('ROLE_ADMIN');
         if ($form->isSubmitted() && $form->isValid()) {
             $categoryRepository->add($category, true);
-
             return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('category/edit.html.twig', [
-            'category' => $category,
-            'form' => $form,
-        ]);
+        if($hasAccessAdmin){
+            return $this->renderForm('category/edit.html.twig', [
+                'category' => $category,
+                'form' => $form,
+            ]);
+        }else{
+            return new Response("No Access");
+        }
     }
 
     /**
@@ -92,6 +99,7 @@ class CategoryController extends AbstractController
     public function delete(Request $request, Category $category,
                            CategoryRepository $categoryRepository, LoggerInterface $logger): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $user=$this->getUser();
         if ($this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))) {
             $categoryRepository->remove($category, true);

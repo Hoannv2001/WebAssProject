@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Author;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -46,6 +47,15 @@ class AuthorRepository extends ServiceEntityRepository
             ->from('App:Author', 'a');
         return $qb->getQuery();
 
+    }
+    public function findBookByAuthor($author):Query
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select('a')
+            ->from('App:Author', 'a')
+            ->where('a.author =' . $author);
+        return $qb->getQuery();
     }
 
 //    /**

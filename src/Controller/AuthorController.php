@@ -33,6 +33,7 @@ class AuthorController extends AbstractController
         $author = new Author();
         $form = $this->createForm(AuthorType::class, $author);
         $form->handleRequest($request);
+        $hasAccessAdmin = $this->isGranted('ROLE_ADMIN');
 
         if ($form->isSubmitted() && $form->isValid()) {
             $authorRepository->add($author, true);
@@ -40,10 +41,14 @@ class AuthorController extends AbstractController
             return $this->redirectToRoute('app_author_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('author/new.html.twig', [
-            'author' => $author,
-            'form' => $form,
-        ]);
+        if($hasAccessAdmin){
+            return $this->renderForm('author/new.html.twig', [
+                'author' => $author,
+                'form' => $form,
+            ]);
+        }else{
+            return new Response("No Access");
+        }
     }
 
     /**
@@ -51,9 +56,14 @@ class AuthorController extends AbstractController
      */
     public function show(Author $author): Response
     {
-        return $this->render('author/show.html.twig', [
-            'author' => $author,
-        ]);
+        $hasAccessAdmin = $this->isGranted('ROLE_ADMIN');
+        if($hasAccessAdmin){
+            return $this->render('author/show.html.twig', [
+                'author' => $author,
+            ]);
+        }else{
+            return new Response("No Access");
+        }
     }
 
     /**
@@ -69,11 +79,16 @@ class AuthorController extends AbstractController
 
             return $this->redirectToRoute('app_author_index', [], Response::HTTP_SEE_OTHER);
         }
+        $hasAccessAdmin = $this->isGranted('ROLE_ADMIN');
+        if($hasAccessAdmin){
+            return $this->renderForm('author/edit.html.twig', [
+                'author' => $author,
+                'form' => $form,
+            ]);
+        }else{
+            return new Response("No Access");
+        }
 
-        return $this->renderForm('author/edit.html.twig', [
-            'author' => $author,
-            'form' => $form,
-        ]);
     }
 
     /**

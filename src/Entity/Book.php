@@ -45,13 +45,24 @@ class Book
     private $author;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Order::class, mappedBy="orderBook")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="books")
+     * @ORM\JoinColumn(name="email", referencedColumnName="email")
      */
-    private $orders;
+    private $user;
+
+    /**
+     * @ORM\OneToMany(targetEntity=OrderItems::class, mappedBy="book")
+     */
+    private $orderItems;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $image;
 
     public function __construct()
     {
-        $this->orders = new ArrayCollection();
+        $this->orderItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -119,30 +130,59 @@ class Book
         return $this;
     }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
     /**
-     * @return Collection<int, Order>
+     * @return Collection<int, OrderItems>
      */
-    public function getOrders(): Collection
+    public function getOrderItems(): Collection
     {
-        return $this->orders;
+        return $this->orderItems;
     }
 
-    public function addOrder(Order $order): self
+    public function addOrderItem(OrderItems $orderItem): self
     {
-        if (!$this->orders->contains($order)) {
-            $this->orders[] = $order;
-            $order->addOrderBook($this);
+        if (!$this->orderItems->contains($orderItem)) {
+            $this->orderItems[] = $orderItem;
+            $orderItem->setBook($this);
         }
 
         return $this;
     }
 
-    public function removeOrder(Order $order): self
+    public function removeOrderItem(OrderItems $orderItem): self
     {
-        if ($this->orders->removeElement($order)) {
-            $order->removeOrderBook($this);
+        if ($this->orderItems->removeElement($orderItem)) {
+            // set the owning side to null (unless already changed)
+            if ($orderItem->getBook() === $this) {
+                $orderItem->setBook(null);
+            }
         }
 
         return $this;
     }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+
 }

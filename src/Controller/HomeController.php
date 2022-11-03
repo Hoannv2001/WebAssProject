@@ -39,7 +39,6 @@ class HomeController extends AbstractController
         $paginator = new Paginator($temQuery2);
         $totalItems2 = count($paginator);
 
-
         if ($hasAccess){
             return $this->render('home/index.html.twig',[
                 'controller_name' => 'HomeController',

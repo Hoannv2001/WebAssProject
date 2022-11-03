@@ -2,13 +2,19 @@
 
 namespace App\Form;
 
+use App\Controller\BookController;
 use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\Category;
+use App\Entity\User;
+use phpDocumentor\Reflection\DocBlock\Tags\Uses;
+use phpDocumentor\Reflection\Types\Collection;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class BookType extends AbstractType
 {
@@ -27,10 +33,14 @@ class BookType extends AbstractType
                 'class'=>Author::class,
                 'choice_label'=>'authorName'
             ])
-//             ->add('orders', EntityType::class,[
-//                 'class'=>
-//             ])
+            ->add('Image', FileType::class, [
+                'label' => 'Book Thumbnail',
+                'mapped' => false,
+                'required' => false,
+            ])
+
         ;
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
